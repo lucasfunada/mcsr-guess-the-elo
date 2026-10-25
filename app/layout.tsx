@@ -18,6 +18,10 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 });
 
+export const metadata = {
+  title: "MCSR Guess the Elo",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

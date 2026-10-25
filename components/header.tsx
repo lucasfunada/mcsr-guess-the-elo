@@ -47,11 +47,25 @@ export function Header() {
               </Link>
             </nav>
           </details>
-          <span className="font-bold">MCSR Guess the Elo</span>
+          <div className="px-3">
+            <span className="block text-xs leading-4 text-foreground/70">
+              MCSR Ranked
+            </span>
+            <span className="block text-xl font-bold">
+              GUESS THE <span className="text-[#ffaa00]">ELO</span>
+            </span>
+          </div>
         </div>
       </header>
       <aside className="sticky top-0 hidden h-svh w-60 shrink-0 flex-col border-r bg-background p-4 lg:flex">
-        <span className="px-3 font-bold">MCSR Guess the Elo</span>
+        <div className="px-3">
+          <span className="block text-xs leading-4 text-foreground/70">
+            MCSR Ranked
+          </span>
+          <span className="block text-xl font-bold">
+            GUESS THE <span className="text-[#ffaa00]">ELO</span>
+          </span>
+        </div>
         <Separator className="mt-4" />
         <nav
           aria-label="Main navigation"
