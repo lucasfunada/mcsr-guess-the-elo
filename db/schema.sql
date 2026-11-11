@@ -11,7 +11,7 @@ CREATE TABLE runs (
     split_fortress INTEGER,
     split_blind INTEGER,
     split_eyespy INTEGER,
-    split_end INTEGER
+    split_end INTEGER,
     video_offset SMALLINT NOT NULL DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'pending',
     CONSTRAINT runs_status_check
