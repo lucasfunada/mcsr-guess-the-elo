@@ -6,13 +6,16 @@ CREATE TABLE runs (
     player_uuid UUID NOT NULL,
     player_elo INTEGER NOT NULL,
     submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    approved_at TIMESTAMPTZ,
     split_nether INTEGER,
     split_bastion INTEGER,
     split_fortress INTEGER,
     split_blind INTEGER,
     split_eyespy INTEGER,
     split_end INTEGER
+    video_offset SMALLINT NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'pending',
+    CONSTRAINT runs_status_check
+        CHECK (status IN ('pending', 'approved', 'rejected'))
 );
 
 CREATE TABLE challenges (
