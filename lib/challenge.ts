@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { cacheLife } from "next/cache";
 
-type DailyData = {
+type ChallengeData = {
   challengeId: string;
   date: string;
   videoId: string;
@@ -11,34 +11,17 @@ type DailyData = {
   blind: number | null;
   eyeSpy: number | null;
   end: number | null;
+  offset: number;
 };
 
-export async function GET() {
-  // Include the UTC date in the cache key so a new day gets a new entry.
-  const date = new Date().toISOString().slice(0, 10);
-
-  try {
-    const dailyData = await getDailyData(date);
-
-    if (!dailyData) {
-      return Response.json({ error: "No challenge today" }, { status: 404 });
-    }
-
-    return Response.json(dailyData);
-  } catch (error) {
-    console.error("Failed to load daily challenge", error);
-    return Response.json({ error: "Server error" }, { status: 500 });
-  }
-}
-
-async function getDailyData(date: string): Promise<DailyData | null> {
+export async function getChallengeData(date: string): Promise<ChallengeData | null> {
   "use cache";
   cacheLife("minutes");
 
-  const result = await db.query<DailyData>(
+  const result = await db.query<ChallengeData>(
     `
       SELECT
-        c.id::text AS "challengeId",
+        c.id AS "challengeId",
         c.challenge_date::text AS "date",
         r.youtube_id AS "videoId",
         r.split_nether AS "nether",
@@ -46,11 +29,12 @@ async function getDailyData(date: string): Promise<DailyData | null> {
         r.split_fortress AS "fortress",
         r.split_blind AS "blind",
         r.split_eyespy AS "eyeSpy",
-        r.split_end AS "end"
+        r.split_end AS "end",
+        r.video_offset AS "offset"
       FROM challenges c
       JOIN runs r ON r.id = c.run_id
       WHERE c.challenge_date = $1
-        AND r.approved_at IS NOT NULL
+        AND r.status = 'approved'
       LIMIT 1
     `,
     [date]

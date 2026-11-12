@@ -19,7 +19,7 @@ export async function POST(request: Request) {
         if (
             !guess ||
             typeof guess.challengeId !== "string" ||
-            !/^\d+$/.test(guess.challengeId) ||
+            !/^[1-9]\d*$/.test(guess.challengeId) ||
             !Number.isInteger(guess.eloGuess) ||
             guess.eloGuess < 0 ||
             guess.eloGuess % 10 !== 0
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
             JOIN runs r ON r.id = c.run_id
             WHERE c.id = $1
                 AND c.challenge_date <= $2
-                AND r.approved_at IS NOT NULL
+                AND r.status = 'approved'
             LIMIT 1
             `,
             [guess.challengeId, date]
@@ -50,6 +50,7 @@ export async function POST(request: Request) {
         return Response.json({
             ...player,
             score: calculateScore(guess.eloGuess, player.playerElo),
+            guess: guess.eloGuess,
         });
     } catch (error) {
         console.error("Error submitting guess:", error);
@@ -61,8 +62,14 @@ function calculateScore(guessElo: number, actualElo: number): number {
     if (!Number.isFinite(guessElo) || !Number.isFinite(actualElo)) {
         return 0;
     }
+
+    const maxScore = 1000;
+    const tolerance = 5;
+    const zeroScoreDifference = 800;
+
     const eloDifference = Math.abs(guessElo - actualElo);
-    // Allow 5 Elo of error because guesses move in steps of 10.
-    const adjustedDifference = Math.max(0, eloDifference - 5);
-    return Math.max(0, Math.round(1000 - adjustedDifference * 2));
+    const adjustedDifference = Math.max(0, eloDifference - tolerance);
+    const penalty = maxScore * adjustedDifference / (zeroScoreDifference - tolerance);
+
+    return Math.max(0, Math.round(maxScore - penalty));
 }

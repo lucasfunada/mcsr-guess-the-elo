@@ -15,12 +15,12 @@ const splitButtons = [
 ] as const;
 
 export type Splits = {
-  nether: number;
-  bastion: number;
-  fortress: number;
-  blind: number;
-  eyeSpy: number;
-  end: number;
+  nether: number | null;
+  bastion: number | null;
+  fortress: number | null;
+  blind: number | null;
+  eyeSpy: number | null;
+  end: number | null;
 };
 
 declare global {
@@ -38,9 +38,13 @@ const formatTime = (seconds: number) => {
 export function VideoPlayer({
   videoId,
   splits,
+  onPlayerReadyChange,
+  offset
 }: {
   videoId: string;
   splits: Splits;
+  onPlayerReadyChange: (ready: boolean) => void;
+  offset: number;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YT.Player | null>(null);
@@ -67,6 +71,7 @@ export function VideoPlayer({
     if (!apiReady || !container) return;
 
     setPlayerReady(false);
+    onPlayerReadyChange(false);
     const playerElement = document.createElement("div");
     container.replaceChildren(playerElement);
 
@@ -80,6 +85,7 @@ export function VideoPlayer({
       events: {
         onReady: () => {
           setPlayerReady(true);
+          onPlayerReadyChange(true);
         },
       },
     });
@@ -91,7 +97,7 @@ export function VideoPlayer({
       playerRef.current = null;
       container.replaceChildren();
     };
-  }, [apiReady, videoId]);
+  }, [apiReady, videoId, onPlayerReadyChange]);
 
   return (
     <>
@@ -105,7 +111,7 @@ export function VideoPlayer({
       />
       <div ref={containerRef} className="aspect-video w-full" />
       <div
-        className="mt-4 grid w-full grid-cols-3 gap-4 md:grid-cols-6"
+        className="mt-2 grid w-full grid-cols-3 gap-4 md:grid-cols-6"
         aria-label="Run Splits"
       >
         {splitButtons.map(({ key, label, color }) => (
@@ -114,14 +120,14 @@ export function VideoPlayer({
             key={key}
             type="button"
             disabled={!playerReady}
-            onClick={() => playerRef.current?.seekTo(splits[key], true)}
+            onClick={() => splits[key] !== null && playerRef.current?.seekTo(splits[key] + offset, true)}
             style={{ backgroundColor: color }}
             className="flex h-16 w-full min-w-0 flex-col gap-0 p-2 hover:brightness-110 md:px-6"
           >
             <span className="text-xl">
               {label}
             </span>
-            {splits[key] !== undefined && (
+            {splits[key] !== null && (
               <span className="ml-1 text-lg text-muted-foreground">
                 {formatTime(splits[key])}
               </span>
