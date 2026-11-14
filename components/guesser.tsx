@@ -46,7 +46,11 @@ const ranks: RankInfo[] = [
   { minElo: 0, label: "Coal I", color: "#aaaaaa" },
 ];
 
-function handleSubmit(elo: number, challengeId: string, setResult: (result: Result | null) => void, setDialogOpen: (open: boolean) => void) {
+function getRank(elo: number): RankInfo {
+  return ranks.find((rank) => elo >= rank.minElo) ?? ranks[ranks.length - 1];
+}
+
+function handleSubmit(elo: number, challengeId: string, setResult: (result: Result | null) => void) {
   fetch("/api/guess", {
     method: "POST",
     headers: {
@@ -63,7 +67,6 @@ function handleSubmit(elo: number, challengeId: string, setResult: (result: Resu
         alert(`Error: ${data.error}`);
       } else {
         setResult(data);
-        setDialogOpen(true);
         localStorage.setItem(
           `challenge-result:${challengeId}`,
           JSON.stringify(data)
@@ -84,9 +87,8 @@ export default function Guesser({
   playerReady: boolean;
 }) {
   const [elo, setElo] = useState(1500);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
-  const currentRank = ranks.find((rank) => elo >= rank.minElo) ?? ranks[ranks.length - 1];
+  const currentRank = getRank(elo);
 
   useEffect(() => {
     const savedResult = localStorage.getItem(`challenge-result:${challengeId}`);
@@ -148,12 +150,15 @@ export default function Guesser({
           {currentRank.label}
         </div>
         <div className="mt-2 text-center">
-          <Button variant="minecraft" type="button" className="w-1/4 h-10 text-xl" disabled={!playerReady} onClick={() => handleSubmit(elo, challengeId, setResult, setDialogOpen)}>Submit</Button>
+          <Button variant="minecraft" type="button" className="w-1/4 h-10 text-xl" disabled={!playerReady} onClick={() => handleSubmit(elo, challengeId, setResult)}>Submit</Button>
         </div>
       </div>
     );
   }
   else {
+    const guessRank = getRank(result.guess);
+    const actualRank = getRank(result.playerElo);
+
     return (
       <div className="mx-auto mt-2 grid w-full grid-cols-2 gap-4 md:grid-cols-4">
         <div className="text-center">
@@ -171,6 +176,9 @@ export default function Guesser({
           <span className="block text-4xl font-bold">
             {result?.guess}
           </span>
+          <span className="block font-minecraft text-lg" style={{ color: guessRank.color }}>
+            {guessRank.label}
+          </span>
         </div>
         <div className="text-center">
           <span className="block text-xl font-bold text-[#ffaa00] font-minecraft">
@@ -178,6 +186,9 @@ export default function Guesser({
           </span>
           <span className="block text-4xl font-bold">
             {result?.playerElo}
+          </span>
+          <span className="block font-minecraft text-lg" style={{ color: actualRank.color }}>
+            {actualRank.label}
           </span>
         </div>
         <div className="text-center">
@@ -195,7 +206,7 @@ export default function Guesser({
                 className="shrink-0 [image-rendering:pixelated]"
               />
             )}
-            <span className="min-w-0 break-words text-4xl font-bold">
+            <span className="min-w-0 text-4xl font-bold">
               {result.playerName}
             </span>
           </div>
