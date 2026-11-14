@@ -112,7 +112,7 @@ export function VideoPlayer({
       />
       <div ref={containerRef} className="aspect-video w-full" />
       <div
-        className="mt-2 grid w-full grid-cols-3 gap-4 md:grid-cols-6"
+        className="grid w-full grid-cols-3 gap-4 md:grid-cols-6"
         aria-label="Run Splits"
       >
         {splitButtons.map(({ key, label, color }) => (

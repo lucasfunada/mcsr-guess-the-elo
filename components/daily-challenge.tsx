@@ -1,4 +1,5 @@
 import { ChallengeUI } from "@/components/challenge-ui";
+import { DailyResetTimer } from "@/components/daily-reset-timer";
 import { getChallengeData } from "@/lib/challenge";
 import { connection } from "next/server";
 
@@ -18,9 +19,12 @@ export async function DailyChallenge() {
 
   return (
     <>
-      <h1 className="text-xl font-normal font-minecraft">
-        Daily Challenge #{dailyData.challengeId}
-      </h1>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-xl font-minecraft text-center">
+          Daily Challenge
+        </h1>
+        <DailyResetTimer challengeDate={today} />
+      </div>
       <ChallengeUI
         challengeId={dailyData.challengeId}
         videoId={dailyData.videoId}

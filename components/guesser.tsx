@@ -100,7 +100,7 @@ export default function Guesser({
 
   if (!result) {
     return (
-      <div className="mx-auto mt-2 w-full">
+      <div className="mx-auto w-full">
         <Slider
           value={[elo]}
           onValueChange={(value) =>
