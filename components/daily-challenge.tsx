@@ -9,7 +9,7 @@ export async function DailyChallenge() {
 
   if (!dailyData) {
     return (
-      <div>
+      <div className="text-center">
         <h1 className="tracking-wider text-xl font-normal font-minecraft mb-2">No Daily Challenge Today</h1>
         <p>There is no daily challenge available for today. Please check back later.</p>
       </div>

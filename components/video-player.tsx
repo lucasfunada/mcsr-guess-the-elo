@@ -30,8 +30,9 @@ declare global {
 }
 
 const formatTime = (seconds: number) => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
+  const wholeSeconds = Math.floor(seconds);
+  const minutes = Math.floor(wholeSeconds / 60);
+  const remainingSeconds = wholeSeconds % 60;
   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 }
 
@@ -120,7 +121,7 @@ export function VideoPlayer({
             key={key}
             type="button"
             disabled={!playerReady}
-            onClick={() => splits[key] !== null && playerRef.current?.seekTo(splits[key] + offset, true)}
+            onClick={() => splits[key] !== null && playerRef.current?.seekTo(splits[key]/1000 + offset, true)}
             style={{ backgroundColor: color }}
             className="flex h-16 w-full min-w-0 flex-col gap-0 p-2 hover:brightness-110 md:px-6"
           >
@@ -129,7 +130,7 @@ export function VideoPlayer({
             </span>
             {splits[key] !== null && (
               <span className="ml-1 text-lg text-muted-foreground">
-                {formatTime(splits[key])}
+                {formatTime(splits[key]/1000)}
               </span>
             )}
           </Button>
